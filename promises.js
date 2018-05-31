@@ -1,18 +1,17 @@
-function superCompress(input) {
-  return readFromCache(input)
-    .then(
-      result => cleanCacheMetadata(result),
-      error => {
-        if (error.code != 'NoCache') {
-           return Promise.reject(error);
-        }
-        
-        return readFromFile(input)
-        .then(result => {
-          return storeInCache(input, result)
-            .then(() => result);
-        });
-      }
-    )
-    .then(content => compress(content));
+async function superCompress(input) {
+  try{
+    const cached = await readFromCache(input);
+    const cleaned = await cleanCacheMetadata(cached);
+  }
+  catch(error){
+    if (error.code != 'NoCache') {
+      throw error;
+    }
+    const reading = await readFromFile(input);
+    const stored = await storeInCache(input,reading)
+    const content = await compress(content);
+    
+  }
+
+  return compress(content)
 }
